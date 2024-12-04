@@ -5,13 +5,19 @@ variable "enable_service" {
 }
 
 variable "member_account_id" {
-  description = "Member account ID for multi-account setup (optional)"
+  description = "The AWS Account ID of the member account"
   type        = string
-  default     = ""
 }
 
-variable "member_account_email" {
+
+variable "member_email" {
   description = "Email for the member account (optional)"
   type        = string
-  default     = ""
 }
+
+variable "multi_account" {
+  description = "Flag to enable multi-account setup"
+  type        = bool
+  default     = false
+}
+
