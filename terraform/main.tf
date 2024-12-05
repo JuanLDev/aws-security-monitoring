@@ -22,4 +22,9 @@ module "lambda" {
   lambda_role_arn     = module.iam_roles.lambda_role_arn
   kinesis_stream_name = module.kinesis.kinesis_stream_name
 }
+module "s3" {
+  source      = "./modules/s3"
+  bucket_name = "guardduty-findings-${var.environment}" # Replace with your naming convention
+  environment = var.environment
+}
 

@@ -18,3 +18,8 @@ variable "aws_account_id" {
   type        = string
   default     = "277707129094" # Change if needed
 }
+variable "environment" {
+  description = "The environment for the project"
+  type        = string
+  default     = "processed"
+}
