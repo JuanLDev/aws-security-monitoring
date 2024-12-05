@@ -5,8 +5,9 @@ resource "aws_iam_policy" "lambda_kinesis_policy" {
     Statement = [
       {
         Effect   = "Allow",
-        Action   = ["kinesis:GetRecords", "kinesis:DescribeStream", "kinesis:ListStreams"],
-        Resource = module.kinesis.kinesis_stream_arn
+        Action   = ["kinesis:GetRecords","kinesis:PutRecord", "kinesis:DescribeStream", "kinesis:ListStreams"],
+        Resource = "arn:aws:kinesis:${var.aws_region}:${var.aws_account_id}:stream/${var.kinesis_stream_name}"
+
       },
       {
         Effect   = "Allow",
@@ -16,8 +17,24 @@ resource "aws_iam_policy" "lambda_kinesis_policy" {
     ]
   })
 }
+resource "aws_iam_role" "lambda_exec_role_guardduty" {
+  name               = "lambda_exec_role_guardduty"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
 
 resource "aws_iam_role_policy_attachment" "lambda_kinesis_attach" {
-  role       = aws_iam_role.lambda_exec_role.name
+  role       = aws_iam_role.lambda_exec_role_guardduty.name
   policy_arn = aws_iam_policy.lambda_kinesis_policy.arn
 }
