@@ -4,10 +4,11 @@ resource "aws_lambda_function" "guardduty_processor" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.8"
   filename      = var.lambda_zip_file
-
+ 
   environment {
     variables = {
-      KINESIS_STREAM_NAME = var.kinesis_stream_name
+      S3_BUCKET_NAME = "guardduty-findings-processed"
     }
   }
+  
 }

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "guardduty_findings" {
-  bucket = var.bucket_name
+  bucket        = var.bucket_name
   force_destroy = true
 
   tags = {
@@ -15,20 +15,38 @@ resource "aws_s3_bucket_policy" "guardduty_findings_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
+        Sid       = "AllowPopeyeAccess",
+        Effect    = "Allow",
         Principal = {
           AWS = "arn:aws:iam::277707129094:user/popeye"
         },
-        Action = ["s3:GetObject", "s3:PutObject"],
+        Action = ["s3:GetObject", "s3:PutObject", "s3:GetBucketLocation"],
         Resource = [
           "${aws_s3_bucket.guardduty_findings.arn}",
           "${aws_s3_bucket.guardduty_findings.arn}/*"
         ]
+      },
+      {
+        Sid       = "AllowGuardDutyAccess",
+        Effect    = "Allow",
+        Principal = {
+          Service = "guardduty.amazonaws.com"
+        },
+        Action = ["s3:PutObject", "s3:GetBucketLocation"],
+        Resource = [
+          "${aws_s3_bucket.guardduty_findings.arn}",
+          "${aws_s3_bucket.guardduty_findings.arn}/*"
+        ],
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = "277707129094"
+            "aws:SourceArn"     = "arn:aws:guardduty:us-west-2:277707129094:detector/30c9ccce775415c75b7ad196bcad7592"
+          }
+        }
       }
     ]
   })
 }
-
 
 resource "aws_s3_bucket_versioning" "guardduty_findings" {
   bucket = aws_s3_bucket.guardduty_findings.id
